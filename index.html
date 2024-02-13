@@ -200,10 +200,6 @@
 
             window.addEventListener('resize', onWindowResize);
 
-            // URL Input
-
-            const inputLink = document.getElementById("urlInputLink");
-            inputLink.onclick = changeImageUrl;
 
             // Send to Quest
 
@@ -342,48 +338,29 @@
         }
 
         function loadTexture(container, length, url) {
+            const video = document.getElementById('video');
 
-            const loader = new THREE.TextureLoader();
+            const texture = new THREE.VideoTexture(video);
 
-            loader.load(
-                url,
+            document.body.appendChild(ARButton.createButton(renderer));
 
-                function (texture) {
-                    document.body.appendChild(ARButton.createButton(renderer));
+            const geometry = new THREE.PlaneGeometry(0.4, 0.3);
 
-                    let originalWidth = texture.image.width;
-                    let originalHeight = texture.image.height;
+            texture.generateMipmaps = false;
 
-                    let max = Math.max(originalWidth, originalHeight);
-                    let width = (originalWidth / max) * length;
-                    let height = (originalHeight / max) * length;
-
-                    const geometry = new THREE.PlaneGeometry(width, height);
-
-                    texture.generateMipmaps = false;
-
-                    const sobelMaterial = new THREE.ShaderMaterial({
-                        transparent: true,
-                        side: THREE.DoubleSide,
-                        uniforms: {
-                            colorTexture: { value: texture },
-                            opacity: { value: currentOpacity }
-                        },
-                        vertexShader: document.getElementById('vertexshader').textContent,
-                        fragmentShader: document.getElementById('fragmentshader').textContent
-                    });
-
-                    imagePlane = new THREE.Mesh(geometry, sobelMaterial);
-
-                    container.add(imagePlane);
+            const sobelMaterial = new THREE.ShaderMaterial({
+                transparent: true,
+                side: THREE.DoubleSide,
+                uniforms: {
+                    colorTexture: { value: texture },
+                    opacity: { value: currentOpacity }
                 },
+                vertexShader: document.getElementById('vertexshader').textContent,
+                fragmentShader: document.getElementById('fragmentshader').textContent
+            });
 
-                undefined,
-
-                function (err) {
-                    alert("Unable to load image, try a different URL.\n\nCross-Origin Resource Sharing (CORS) policies might prevent the app from loading images from certain websites.");
-                }
-            );
+            imagePlane = new THREE.Mesh(geometry, sobelMaterial);
+            container.add(imagePlane);
         }
 
         function incrementScale(delta) {
@@ -433,21 +410,33 @@
 
     <a class="github-fork-ribbon" href="https://github.com/fabio914/passtracing" data-ribbon="Fork me on GitHub"
         title="Fork me on GitHub">Fork me on GitHub</a>
+    <video id="video" style="display:none" autoplay="true" playsinline="true"></video>
+    <audio id="audio" style="display:none" autoplay="true"></audio>
 
     <div id="container"></div>
 
     <div class="popupWindow">
         <div class="popupHeader">Passtracing - AR Tracing</div>
-        <div class="popupSection">1. Paste an image URL below.<br />2. Click on "Load image" or "Send link to Meta
+        <div class="popupSection">1. Paste an WebRTC Stream URL below.<br />2. Click on "Load Stream" or "Send link to
+            Meta
             Quest".<br />3. Click on the "Start AR" button below to start.</div>
         <div class="popupSection">
             <div style="margin-right: 8px"><input id="urlInput" type="url" style="width: 100%"
-                    placeholder="https://paste.some.website/image/here.jpg" /></div>
+                    value="http://172.22.4.67:8080" /></div>
         </div>
-        <div class="popupSection"><a href="#" style="color: #EFEFEF" id="urlInputLink">Load image</a></div>
+        <div class="popupSection"><a href="#" style="color: #EFEFEF" id="urlInputLink">Load Stream</a></div>
         <div class="popupSection"><a href="#" style="color: #EFEFEF" id="urlToQuestLink">Send link to Meta Quest</a>
+
+
         </div>
+        <!-- <div class="popupSection"> -->
+
+        <!-- <button id="stop" style="display: none" onclick="stop()">Stop</button> -->
+
+        <!-- </div> -->
     </div>
+    <script src="client.js"></script>
+
 </body>
 
 </html>
